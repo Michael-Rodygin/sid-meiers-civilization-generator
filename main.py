@@ -1,16 +1,9 @@
-# This is a sample Python script.
+from web_page import create_web_page
+from read_file import parse_sheet
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+if __name__ == "__main__":
+    # Specify players
+    players = ['Миша', 'Даня', 'Слава', 'Папа']
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    df1, df2, df3, df4, df5, df6 = parse_sheet()
+    create_web_page(df1, df2, df3, df4, df5, df6, players)
