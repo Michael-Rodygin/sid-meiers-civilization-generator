@@ -99,6 +99,19 @@ def reroll_player(player_index):
         
     return state
 
+def generate_new_event():
+    state = load_state()
+    if not state:
+        return None
+        
+    df6 = state['decks']['df6']
+    new_event = df6.sample(random_state=np.random.RandomState())
+    new_event.index = [':']
+    
+    state['random_event'] = new_event
+    save_state(state)
+    return state
+
 def update_player_names(new_players):
     state = load_state()
     if not state:
