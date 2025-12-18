@@ -8,7 +8,7 @@ import state_manager
 from random_generator import find_odds
 
 def display_table(table, player_flag, player_name, player_index) -> None:
-    start, col1, mid, col2, end = st.columns([0.5, 2.5, 1, 12, 3])
+    start, col1, mid, col2, end = st.columns([0.5, 3.5, 1, 12, 3])
 
     # Reroll button
     # Logic: disabled=False if state else False -> always False (enabled).
@@ -257,6 +257,7 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             border: 4px ridge #c9a959;
             box-shadow: 0 5px 15px rgba(0,0,0,0.6);
             border-radius: 2px;
+            width: 100% !important;
         }
 
         /* Seating Plan - Map Table Style */
@@ -564,7 +565,6 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
         <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(30,41,59,0.5); border-radius: 8px; border-left: 3px solid #38bdf8;">
             <div style="font-size: 0.9rem; color: #94a3b8;">Карту раскладывает: <span style="color: #e2e8f0; font-weight: 600;">{map_maker_name}</span></div>
             <div style="font-size: 0.9rem; color: #94a3b8; margin-top: 0.25rem;">Первый Игрок: <span style="color: #e2e8f0; font-weight: 600;">{first_player_name}</span></div>
-            <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem; font-style: italic;">(GM - Game Master)</div>
         </div>
         """, unsafe_allow_html=True)
 
