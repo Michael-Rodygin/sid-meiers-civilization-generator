@@ -29,14 +29,6 @@ def display_table(table, player_flag, player_name, player_index) -> None:
     final = table.drop(columns=['cul', 'eco', 'war', 'tech'], axis=1)
     final = final.rename(columns={"bonus": player_name})
     
-    # Image
-    try:
-        nation_name = table.loc['Нация: ', list(table)[0]]
-        image_path = 'static/img/' + nation_name + '.png'
-        col1.image(image_path, width='stretch')
-    except Exception:
-        col1.write("Image not found")
-
     # Extract values for custom rendering
     try:
         bonus1 = final.loc['Бонус 1: ', player_name]
@@ -49,6 +41,13 @@ def display_table(table, player_flag, player_name, player_index) -> None:
         col2.table(final)
         st.markdown("<div style='margin-bottom: 3rem;'></div>", unsafe_allow_html=True)
         return
+
+    # Nation image (outside collapsible card)
+    try:
+        image_path = 'static/img/' + str(nation) + '.png'
+        col1.image(image_path, width='stretch')
+    except Exception:
+        col1.write("Image not found")
 
     # Determine Title based on Nation
     nation_titles = {
@@ -97,7 +96,8 @@ def display_table(table, player_flag, player_name, player_index) -> None:
         </div>
     </div>
     """
-    col2.markdown(html_card, unsafe_allow_html=True)
+    with col2.expander(full_name, expanded=True):
+        st.markdown(html_card, unsafe_allow_html=True)
 
     # Add vertical spacing between players
     st.markdown("<div style='margin-bottom: 3rem;'></div>", unsafe_allow_html=True)
