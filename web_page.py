@@ -183,12 +183,12 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
 
         /* Player Info Card - Parchment Dossier */
         .player-info-card {
-            background: #e3dac3; /* Light Parchment */
+            background: transparent;
             color: #2c241b; /* Ink */
-            border: 4px double #3d342b;
+            border: none;
             border-radius: 0;
             padding: 1.5rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: none;
             position: relative;
             width: 100%;
             margin: 0;
@@ -349,9 +349,16 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
         /* Tabs */
         .stTabs [data-baseweb="tab-list"] {
             gap: 2px;
-            background-color: #0f0f11;
+            background-color: #1a1a1d;
+            background-image: 
+                linear-gradient(rgba(26, 26, 29, 0.92), rgba(26, 26, 29, 0.95)),
+                url("https://www.transparenttextures.com/patterns/aged-paper.png");
             padding: 0.5rem;
             border-bottom: 2px solid #3d342b;
+        }
+
+        .stTabs [data-baseweb="tab-panel"] {
+            background: transparent;
         }
 
         .stTabs [data-baseweb="tab"] {
@@ -371,25 +378,51 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             border-bottom: none;
         }
 
-        /* Expander content - align card edges with wrapper */
         [data-testid="stExpander"] [data-testid="stExpanderContent"] {
             padding: 0 !important;
         }
+        [data-testid="stExpander"] [data-testid="stExpanderContent"] > div {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        [data-testid="stExpander"] [data-testid="stMarkdownContainer"] {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        /* Style the expander itself as the parchment card */
+        [data-testid="stExpander"] {
+            border: 4px double #3d342b !important;
+            background: #e3dac3 !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+        }
+        /* Give the header a subtle parchment look */
+        [data-testid="stExpander"] div[role="button"] {
+            background: #e3dac3 !important;
+            border-bottom: 2px solid #8b4513 !important;
+            color: #000 !important;
+            opacity: 1 !important;
+            font-family: 'Cinzel', serif !important;
+            letter-spacing: 0.05em !important;
+        }
+        [data-testid="stExpander"] div[role="button"] * {
+            color: #000 !important;
+        }
 
-        /* Mobile-only adjustments */
         @media (max-width: 640px) {
             .player-info-card {
                 padding: 1rem;
             }
             .info-label {
-                min-width: 80px;
+                min-width: 60px;
                 font-size: 0.95rem;
             }
             .info-row {
                 padding-bottom: 0.15rem;
+                gap: 0.4rem;
             }
             .info-value {
                 font-size: 1.05rem;
+                line-height: 1.4;
             }
         }
 
