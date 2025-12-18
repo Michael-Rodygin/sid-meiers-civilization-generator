@@ -186,10 +186,13 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             background: #e3dac3; /* Light Parchment */
             color: #2c241b; /* Ink */
             border: 4px double #3d342b;
-            border-radius: 4px;
+            border-radius: 0;
             padding: 1.5rem;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             position: relative;
+            width: 100%;
+            margin: 0;
+            box-sizing: border-box;
         }
         
         /* Decorative corner flourishes (CSS pseudo-elements could go here, keeping it simple) */
@@ -210,6 +213,7 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             align-items: baseline;
             border-bottom: 1px dashed #bdaea3;
             padding-bottom: 0.2rem;
+            gap: 0.5rem;
         }
 
         .info-label {
@@ -225,6 +229,8 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             flex: 1;
             font-size: 1.1rem;
             font-weight: 600;
+            word-wrap: break-word;
+            white-space: normal;
         }
 
         .nation-row {
@@ -363,6 +369,28 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             color: #c9a959;
             border: 1px solid #c9a959;
             border-bottom: none;
+        }
+
+        /* Expander content - align card edges with wrapper */
+        [data-testid="stExpander"] [data-testid="stExpanderContent"] {
+            padding: 0 !important;
+        }
+
+        /* Mobile-only adjustments */
+        @media (max-width: 640px) {
+            .player-info-card {
+                padding: 1rem;
+            }
+            .info-label {
+                min-width: 80px;
+                font-size: 0.95rem;
+            }
+            .info-row {
+                padding-bottom: 0.15rem;
+            }
+            .info-value {
+                font-size: 1.05rem;
+            }
         }
 
         </style>
