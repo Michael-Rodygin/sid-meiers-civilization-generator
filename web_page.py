@@ -3,6 +3,7 @@ import streamlit as st
 import numpy as np
 import time
 import os
+import base64
 import state_manager
 from random_generator import find_odds
 
@@ -391,7 +392,9 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
         st.header("The Council of Leaders")
         for i, player_name in enumerate(players):
             if i in tables:
-                display_table(tables[i], player_flags[i], player_name, i)
+                table_i = tables[i]
+                if table_i is not None and str(player_name).strip():
+                    display_table(table_i, player_flags[i], player_name, i)
 
     with tab2:
         st.header("Strategic Overview")
@@ -403,7 +406,13 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             seating = game_info['seating']
             map_maker_idx = game_info['map_maker']
             first_player_idx = game_info['first_player']
-            
+            map_b64 = None
+            try:
+                with open("static/img/map.png", "rb") as f:
+                    map_b64 = base64.b64encode(f.read()).decode()
+            except Exception:
+                map_b64 = None
+             
             # Ensure indices are valid
             map_maker_name = players[map_maker_idx] if map_maker_idx < len(players) else players[0]
             first_player_name = players[first_player_idx] if first_player_idx < len(players) else players[0]
@@ -436,20 +445,22 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             cols = len(seating.columns)
             
             for r in range(rows):
-                 for c in range(cols):
-                     # Check if this is part of the 2x2 table block (r=1,2 and c=1,2)
-                     if r == 1 and c == 1:
-                         # Top-left of the block: Render merged cell with map image
-                         seating_html += '<div class="seating-cell cell-table" style="grid-column: span 2; grid-row: span 2; background-image: url(\'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_Map_1689.JPG/640px-World_Map_1689.JPG\'); background-size: cover; background-position: center; opacity: 0.9; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); border: 2px solid #5c4033;"></div>'
-                     elif (r == 1 and c == 2) or (r == 2 and c == 1) or (r == 2 and c == 2):
-                         # Other parts of the block: Skip
-                         continue
-                     else:
-                         # Normal cell
-                         # Get value using iloc
-                         val = seating.iloc[r, c]
-                         cls, style = get_cell_style(val)
-                         seating_html += f'<div class="seating-cell {cls}" style="{style}">{val if val != " " else ""}</div>'
+                for c in range(cols):
+                    # Check if this is part of the 2x2 table block (r=1,2 and c=1,2)
+                    if r == 1 and c == 1:
+                        if map_b64:
+                            seating_html += f'<div class="seating-cell cell-table" style="grid-column: span 2; grid-row: span 2; background-image: url(\'data:image/png;base64,{map_b64}\'); background-size: cover; background-position: center;"></div>'
+                        else:
+                            seating_html += '<div class="seating-cell cell-table" style="grid-column: span 2; grid-row: span 2;"></div>'
+                    elif (r == 1 and c == 2) or (r == 2 and c == 1) or (r == 2 and c == 2):
+                        # Other parts of the block: Skip
+                        continue
+                    else:
+                        # Normal cell
+                        # Get value using iloc
+                        val = seating.iloc[r, c]
+                        cls, style = get_cell_style(val)
+                        seating_html += f'<div class="seating-cell {cls}" style="{style}">{val if val != " " else ""}</div>'
             
             seating_html += '</div></div>'
             st.markdown(seating_html, unsafe_allow_html=True)
@@ -557,19 +568,8 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
         </div>
         """, unsafe_allow_html=True)
 
-        if len(players) == 4:
-            st.divider()
-            # Need to pass tables in correct order: 1, 2, 3, 4
-            # tables dict keys are 0, 1, 2, 3
-            if 0 in tables and 1 in tables and 2 in tables and 3 in tables:
-                table, winner = find_odds(tables[0], tables[1], tables[2], tables[3], players)
-
-                st.header('Вероятности победы, все идут по одному виду победы: ')
-                st.dataframe(table, width='stretch')
-
-                st.header('Вероятности победы, общие: ')
-                st.dataframe(winner, column_order=('2', '1', '0'),
-                             column_config={'0': 'Вероятность', '1': 'Вид победы', '2': 'Игрок'}, width='stretch')
+        if False:
+            pass
 
         st.divider()
         st.header("Имена игроков: ")
@@ -582,13 +582,13 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
                 val = players[i] if i < len(players) else ""
                 label = f'Введите имя игрока {i+1}: '
                 if i < 3: # First 3 mandatory-ish in UI logic?
-                    new_names.append(st.text_input(label=label, value=val))
+                    new_names.append(st.text_input(label=label, value=val, key=f'player_name_{i}'))
                 elif i == 3:
                      # 4th player
-                     new_names.append(st.text_input(label=label, value=val))
+                     new_names.append(st.text_input(label=label, value=val, key=f'player_name_{i}'))
                 elif i == 4:
                      # 5th player
-                     new_names.append(st.text_input(label=label, value=val))
+                     new_names.append(st.text_input(label=label, value=val, key=f'player_name_{i}'))
 
             col1, col2 = st.columns([1, 1])
             submit_button = col1.form_submit_button(label='Submit')
@@ -619,12 +619,4 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
                     state_manager.update_player_names(new_list)
                     st.rerun()
 
-    # Poll for updates from other clients
-    while True:
-        time.sleep(2)
-        try:
-            new_mtime = os.path.getmtime(state_manager.STATE_FILE)
-            if new_mtime > st.session_state.last_mtime:
-                st.rerun()
-        except OSError:
-            pass
+    # Removed continuous polling loop to prevent duplicate components and stale UI
