@@ -1,5 +1,6 @@
 import pickle
 import os
+import json
 import pandas as pd
 import numpy as np
 import random
@@ -7,6 +8,7 @@ from read_file import parse_sheet
 from random_generator import random_distribution, player_seating, shuffle_slice
 
 STATE_FILE = 'game_state.pkl'
+PLAYER_NAMES_FILE = 'player_names.json'
 
 def load_state():
     if os.path.exists(STATE_FILE):
@@ -21,7 +23,28 @@ def save_state(state):
     with open(STATE_FILE, 'wb') as f:
         pickle.dump(state, f)
 
+def save_player_names(names):
+    try:
+        with open(PLAYER_NAMES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(names, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+def load_saved_player_names():
+    if os.path.exists(PLAYER_NAMES_FILE):
+        try:
+            with open(PLAYER_NAMES_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return None
+    return None
+
 def initialize_state(players):
+    # Check for saved player names and override if they exist
+    saved_names = load_saved_player_names()
+    if saved_names:
+        players = saved_names
+
     # Load initial data
     # We need to bypass the st.session_state logic in parse_sheet for the initial load
     # or just use it and extract values.
@@ -126,6 +149,9 @@ def update_player_names(new_players):
     
     state['players'] = new_players
     state['game_info']['seating'] = player_seating(new_players)
+    
+    # Save names persistently
+    save_player_names(new_players)
     
     # If player count changed, we might need to add/remove tables
     # But for "renaming", usually count is same. 
