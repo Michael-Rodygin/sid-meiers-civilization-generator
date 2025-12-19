@@ -680,17 +680,13 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
                     state_manager.update_player_names(new_list)
                     st.rerun()
 
-    # Lightweight file-change sync across clients
-    try:
-        last_seen = st.session_state.get('last_mtime', 0)
-        current_mtime = os.path.getmtime(state_manager.STATE_FILE)
-        if current_mtime > last_seen:
-            st.session_state.last_mtime = current_mtime
-        else:
-            time.sleep(2)
-            # Re-check and rerun if changed
+    # Continuous file-change sync across clients
+    while True:
+        time.sleep(2)
+        try:
             new_mtime = os.path.getmtime(state_manager.STATE_FILE)
             if new_mtime > st.session_state.last_mtime:
+                st.session_state.last_mtime = new_mtime
                 st.rerun()
-    except OSError:
-        pass
+        except OSError:
+            pass
