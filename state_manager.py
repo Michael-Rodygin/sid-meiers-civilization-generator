@@ -71,12 +71,14 @@ def initialize_state(players):
     # Generate initial tables
     tables = {}
     player_flags = {} # p1, p2, etc.
+    locked = {}
     
     # We need to handle up to 5 players
     # Using index 0-4
     for i in range(len(players)):
         tables[i] = random_distribution(df1, df2, df3, df4, df5)
         player_flags[i] = False
+        locked[i] = False
         
     # Random event
     df6_sample = df6.sample(random_state=np.random.RandomState())
@@ -94,6 +96,7 @@ def initialize_state(players):
         },
         'tables': tables,
         'player_flags': player_flags,
+        'locked': locked,
         'random_event': df6_sample,
         'game_info': {
             'seating': seating,
@@ -109,6 +112,10 @@ def reroll_player(player_index):
     state = load_state()
     if not state:
         return None
+        
+    # Prevent reroll if locked
+    if state.get('locked', {}).get(player_index, False):
+        return state
         
     decks = state['decks']
     
@@ -173,6 +180,9 @@ def update_player_names(new_players):
         for i in range(current_count, new_count):
             state['tables'][i] = random_distribution(state['decks']['df1'], state['decks']['df2'], state['decks']['df3'], state['decks']['df4'], state['decks']['df5'])
             state['player_flags'][i] = False
+            if 'locked' not in state:
+                state['locked'] = {}
+            state['locked'][i] = False
     elif new_count < current_count:
         # Remove players (just delete from dict)
         for i in range(new_count, current_count):
@@ -180,6 +190,8 @@ def update_player_names(new_players):
                 del state['tables'][i]
             if i in state['player_flags']:
                 del state['player_flags'][i]
+            if 'locked' in state and i in state['locked']:
+                del state['locked'][i]
                 
     # Re-roll random roles if needed?
     # Original code:
@@ -195,3 +207,13 @@ def reset_game(players):
     if os.path.exists(STATE_FILE):
         os.remove(STATE_FILE)
     return initialize_state(players)
+
+def toggle_lock(player_index, lock=True):
+    state = load_state()
+    if not state:
+        return None
+    if 'locked' not in state:
+        state['locked'] = {}
+    state['locked'][player_index] = lock
+    save_state(state)
+    return state

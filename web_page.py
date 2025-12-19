@@ -7,7 +7,7 @@ import base64
 import state_manager
 from random_generator import find_odds
 
-def display_table(table, player_flag, player_name, player_index) -> None:
+def display_table(table, player_flag, player_name, player_index, locked=False) -> None:
     start, col1, mid, col2, end = st.columns([0.5, 3.5, 1, 12, 3])
 
     # Reroll button
@@ -16,7 +16,12 @@ def display_table(table, player_flag, player_name, player_index) -> None:
     # But current code seems to allow infinite rerolls or at least doesn't disable.
     # We'll keep it enabled.
     
-    click = end.button("Reroll", key=f"reroll_{player_index}")
+    click = end.button("Reroll", key=f"reroll_{player_index}", disabled=locked)
+    lock_label = "🔓 Unlock" if locked else "🔒 Lock"
+    toggle = end.button(lock_label, key=f"lock_{player_index}")
+    if toggle:
+        state_manager.toggle_lock(player_index, lock=not locked)
+        st.rerun()
 
     if click:
         state_manager.reroll_player(player_index)
@@ -64,7 +69,7 @@ def display_table(table, player_flag, player_name, player_index) -> None:
         'Немцы': 'Канцлер',
         'Римляне': 'Император',
         'Русские': 'Царь',
-        'Французы': 'Король',
+        'Французы': 'Первый Консул',
         'Японцы': 'Сёгун',
         'Англичане': 'Король'
     }
@@ -96,7 +101,8 @@ def display_table(table, player_flag, player_name, player_index) -> None:
         </div>
     </div>
     """
-    with col2.expander(full_name, expanded=True):
+    exp_label = f"{'🔒' if locked else '🔓'} {full_name}"
+    with col2.expander(exp_label, expanded=True):
         st.markdown(html_card, unsafe_allow_html=True)
 
     # Add vertical spacing between players
@@ -179,6 +185,15 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             color: #fff;
             border-color: #c9a959;
             transform: translateY(-1px);
+        }
+
+        .stButton > button:disabled {
+            background: #2c2c30 !important;
+            color: #777 !important;
+            border-color: #3d342b !important;
+            cursor: not-allowed !important;
+            opacity: 0.6 !important;
+            transform: none !important;
         }
 
         /* Player Info Card - Parchment Dossier */
@@ -456,7 +471,8 @@ def create_web_page(df1, df2, df3, df4, df5, df6, initial_players):
             if i in tables:
                 table_i = tables[i]
                 if table_i is not None and str(player_name).strip():
-                    display_table(table_i, player_flags[i], player_name, i)
+                    locked = shared_state.get('locked', {}).get(i, False)
+                    display_table(table_i, player_flags[i], player_name, i, locked)
 
     with tab2:
         st.header("Strategic Overview")
