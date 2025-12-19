@@ -5,7 +5,7 @@ A web-based random generator for Civilization game starting configurations. This
 ## Features
 
 - **Random Starting Configuration**: Automatically generates random bonuses, technologies, and nations for each player
-- **Multi-Player Support**: Supports 4-5 players
+- **Multi-Player Support**: Supports 2-5 players
 - **Victory Probability Calculator**: Calculates and displays victory probabilities for different victory types (Culture, Economy, War, Technology)
 - **Player Seating Arrangement**: Randomly arranges player seating positions
 - **Random Events**: Generates random events for each game session
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 2. Edit `main.py` to specify your players:
 ```python
-players = ['Миша', 'Даня', 'Слава', 'Папа']
+players = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
 ```
 
 3. Run the application:
@@ -84,15 +84,14 @@ CivilizationStartingGenerator/
 ## How It Works
 
 1. The application reads starting configurations from `Civ_bonuses.xlsx`
-2. Data is organized by tiers (1-6)
-3. For each player, the system randomly selects:
+2. For each player, the system randomly selects:
    - 1 bonus from tier 1
    - 1 bonus from tier 2
    - 1 bonus from tier 3
-   - 1 technology from tier 4
-   - 1 nation from tier 5
+   - 1 technology 
+   - 1 nation 
+3. 1 Random event is selected from the Global Event pool
 4. Victory probabilities are calculated based on the selected bonuses
-5. Random events are selected from tier 6
 
 ## Notes
 
@@ -102,5 +101,5 @@ CivilizationStartingGenerator/
 
 ## License
 
-This project is for personal/educational use.
+This project is for personal use.
 
